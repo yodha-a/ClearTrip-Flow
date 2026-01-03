@@ -1,0 +1,368 @@
+.image-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    min-height: 400px;
+    position: relative;
+}
+
+.tour-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    color: #22c55e;
+    border: 2px dashed #22c55e;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.tour-btn:hover {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: #16a34a;
+    color: #16a34a;
+}
+
+.upload-prompt {
+    cursor: pointer;
+}
+
+.upload-box {
+    width: 150px;
+    height: 150px;
+    border: 3px dashed #ccc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    transition: all 0.2s ease;
+}
+
+.upload-box:hover {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.upload-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.upload-box p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.tree-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.tree-controls {
+    margin-bottom: 20px;
+}
+
+.export-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.export-btn:hover {
+    background: #2563eb;
+}
+
+.tree-container {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    /* hide overflow as requested */
+    padding: 45px;
+    width: 100%;
+}
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 2px solid #eee;
+}
+
+.modal-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.label-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.label-input:focus {
+    border-color: #22c55e;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #666;
+}
+
+.cancel-btn:hover {
+    background: #eee;
+}
+
+.submit-btn {
+    background: #22c55e;
+    border: 1px solid #16a34a;
+    color: white;
+}
+
+.submit-btn:hover {
+    background: #16a34a;
+}
+
+/* Create Panorama Button */
+.create-pano-btn {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    color: #3b82f6;
+    border: 2px dashed #3b82f6;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 100;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.create-pano-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+/* Image Selector Modal */
+.image-selector-modal {
+    background: #1a1a2e;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.image-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-selector-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 18px;
+}
+
+.close-selector-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.close-selector-btn:hover {
+    opacity: 1;
+}
+
+.saved-panoramas-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.saved-panoramas-section h4 {
+    margin: 0 0 16px 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.panorama-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.panorama-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.panorama-item:hover {
+    border-color: #22c55e;
+    transform: translateY(-2px);
+}
+
+.panorama-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+}
+
+.panorama-item span {
+    display: block;
+    padding: 8px;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.upload-section {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upload-from-computer-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.upload-from-computer-btn:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.create-pano-in-selector-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed #3b82f6;
+    border-radius: 12px;
+    color: #3b82f6;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.create-pano-in-selector-btn:hover {
+    border-color: #2563eb;
+    background: rgba(59, 130, 246, 0.2);
+    color: #2563eb;
+}
+
+.upload-icon-small {
+    font-size: 20px;
+}

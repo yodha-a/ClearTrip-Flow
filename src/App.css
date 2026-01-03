@@ -1,0 +1,16 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.app h1 {
+  font-size: 2rem;
+  color: #cdcdcd;
+  margin-bottom: 1rem;
+}

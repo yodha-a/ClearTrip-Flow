@@ -1,0 +1,211 @@
+.image-node-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-node-row {
+    display: flex;
+    align-items: center;
+}
+
+.image-node-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-node {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.node-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.node-label {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #e3e3e3;
+    text-align: center;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.add-button {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid #16a34a;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+    z-index: 10;
+}
+
+.add-button:hover {
+    background: #16a34a;
+    transform: scale(1.1);
+}
+
+.add-button-bottom {
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.add-button-bottom:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+.add-button-right {
+    right: -12px;
+    top: 38px;
+}
+
+.add-button-right:hover {
+    transform: scale(1.1);
+}
+
+.plus-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Arrow/connector styles */
+.children-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* margin-top: 8px; */
+    position: relative;
+}
+
+.parent-line {
+    width: 2px;
+    height: 20px;
+    background-color: #ccc;
+}
+
+.children-row {
+    display: flex;
+    /* padding-top: 20px; */
+    position: relative;
+}
+
+.child-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 20px 20px 0 20px;
+    /* Top padding for connector space */
+}
+
+/* Lines for the tree structure */
+.child-wrapper::before,
+.child-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
+    width: 50%;
+    height: 20px;
+}
+
+.child-wrapper::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #ccc;
+}
+
+/* Only left half of the top border for the first child */
+.child-wrapper:only-child::after,
+.child-wrapper:only-child::before {
+    display: none;
+}
+
+.child-wrapper:only-child {
+    padding-top: 0;
+}
+
+/* Vertical line for only child */
+.child-wrapper:only-child>.image-node-container::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20px;
+    background-color: #ccc;
+}
+
+/* Remove left line from first child and right line from last child */
+.child-wrapper:first-child::before {
+    border: 0 none;
+}
+
+.child-wrapper:last-child::after {
+    border: 0 none;
+}
+
+/* Add vertical line down to the node */
+.child-wrapper::after {
+    border-left: 2px solid #ccc;
+}
+
+/* Rounded corners */
+.child-wrapper:first-child::after {
+    border-radius: 10px 0 0 0;
+}
+
+.child-wrapper:last-child::before {
+    border-right: 2px solid #ccc;
+    border-radius: 0 10px 0 0;
+}
+
+/* Arrow head */
+.child-wrapper .image-node-container {
+    position: relative;
+}
+
+/* Arrow pointing down to the child */
+.child-wrapper .image-node-container::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ccc;
+}

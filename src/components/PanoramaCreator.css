@@ -1,0 +1,371 @@
+.panorama-creator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.panorama-creator-modal {
+    background: #1a1a2e;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.panorama-creator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panorama-creator-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 20px;
+}
+
+.panorama-creator-header .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.panorama-creator-header .close-btn:hover {
+    opacity: 1;
+}
+
+.panorama-creator-content {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.opencv-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px;
+    color: #fbbf24;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #22c55e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner.small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+}
+
+.upload-area:hover {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.upload-text {
+    display: block;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    display: block;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+}
+
+.images-list {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.images-list h3 {
+    margin: 0 0 16px 0;
+    color: white;
+    font-size: 16px;
+}
+
+.image-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.image-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.move-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.move-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.move-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.image-number {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.5);
+    width: 24px;
+}
+
+.image-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.image-name {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    color: #ef4444;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.remove-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+}
+
+.stitch-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.stitch-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.stitch-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.panorama-result {
+    text-align: center;
+}
+
+.panorama-result h3 {
+    margin: 0 0 16px 0;
+    color: #22c55e;
+}
+
+.panorama-preview {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    padding: 8px;
+    overflow-x: auto;
+}
+
+.panorama-preview img {
+    max-height: 300px;
+    border-radius: 8px;
+}
+
+.status-log {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.log-line {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 2px 0;
+}
+
+/* Name Modal */
+.name-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+}
+
+.name-modal {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.name-modal h3 {
+    margin: 0 0 16px 0;
+    color: white;
+}
+
+.name-modal-preview {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.name-modal-preview img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+}
+
+.name-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+.name-input:focus {
+    border-color: #22c55e;
+}
+
+.name-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.name-modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.name-modal-buttons button {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.download-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.download-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.save-btn {
+    background: #22c55e;
+    border: none;
+    color: white;
+}
+
+.save-btn:hover:not(:disabled) {
+    background: #16a34a;
+}
+
+.save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
