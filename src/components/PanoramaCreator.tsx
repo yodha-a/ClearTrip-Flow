@@ -401,6 +401,7 @@ export function PanoramaCreator({ onClose, onSave }: PanoramaCreatorProps) {
         const pano_pix = pano.ucharPtr(y, x);
 
         const has_dst = mask_dst.ucharPtr(y, x)[0] > 0;
+        const has_src = mask_src.ucharPtr(y, x)[0] > 0;
         const in_overlap = overlap.ucharPtr(y, x)[0] > 0;
 
         if (in_overlap) {
@@ -424,7 +425,7 @@ export function PanoramaCreator({ onClose, onSave }: PanoramaCreatorProps) {
           for (let c = 0; c < 3; c++) {
             pano_pix[c] = dst_pix[c];
           }
-        } else if (src_pix[3] > 10) {
+        } else if (has_src && src_pix[3] > 10) {
           for (let c = 0; c < 3; c++) {
             pano_pix[c] = src_pix[c];
           }
@@ -493,15 +494,8 @@ export function PanoramaCreator({ onClose, onSave }: PanoramaCreatorProps) {
       setProgress("Converting to OpenCV...");
       const mats = loadedImages.map((img, idx) => {
         const canvas = document.createElement("canvas");
-        const maxDim = 800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxDim || height > maxDim) {
-          const scale = Math.min(maxDim / width, maxDim / height);
-          width = Math.floor(width * scale);
-          height = Math.floor(height * scale);
-        }
+        const width = img.width;
+        const height = img.height;
 
         canvas.width = width;
         canvas.height = height;

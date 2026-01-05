@@ -1,610 +1,621 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panoramic Stitcher</title>
-    <script src="https://docs.opencv.org/4.8.0/opencv.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-      .scroll-container { overflow-x: auto; max-width: 100%; }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="text/babel">
-      const { useState, useRef, useEffect } = React;
 
-      const Upload = () => (<svg className="w-16 h-16 mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>);
-      const ArrowUp = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>);
-      const ArrowDown = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>);
-      const Trash = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>);
-      const Loader = () => (<svg className="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>);
-      const Download = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>);
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panoramic Stitcher</title>
+  <script src="https://docs.opencv.org/4.8.0/opencv.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-      function OpenCVPanorama() {
-        const [images, setImages] = useState([]);
-        const [panorama, setPanorama] = useState(null);
-        const [processing, setProcessing] = useState(false);
-        const [progress, setProgress] = useState("");
-        const [opencvReady, setOpencvReady] = useState(false);
-        const [statusLog, setStatusLog] = useState([]);
+    .scroll-container {
+      overflow-x: auto;
+      max-width: 100%;
+    }
+  </style>
+</head>
 
-        useEffect(() => {
-          addLog("Initializing application...");
-          if (window.cv && window.cv.Mat) {
-            setOpencvReady(true);
-            addLog("✓ OpenCV loaded successfully!");
-          } else {
-            addLog("⏳ Loading OpenCV library...");
-            const checkOpenCV = setInterval(() => {
-              if (window.cv && window.cv.Mat) {
-                setOpencvReady(true);
-                addLog("✓ OpenCV loaded successfully!");
-                clearInterval(checkOpenCV);
-              }
-            }, 100);
-          }
-        }, []);
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
 
-        const addLog = (message) => {
-          setStatusLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
-        };
+    const Upload = () => (<svg className="w-16 h-16 mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>);
+    const ArrowUp = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>);
+    const ArrowDown = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>);
+    const Trash = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>);
+    const Loader = () => (<svg className="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>);
+    const Download = () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>);
 
-        const handleImageUpload = (e) => {
-          const files = Array.from(e.target.files);
-          
-          // Extract numbers from filenames and sort: DSC02932 -> 2, DSC02931 -> 1, etc.
-          files.sort((a, b) => {
-            // Extract the last digit before the extension
-            const numA = parseInt(a.name.replace(/\D/g, '').slice(-1));
-            const numB = parseInt(b.name.replace(/\D/g, '').slice(-1));
-            
-            // Custom order: 2, 1, 0, 3, 4 (bottom to top in display)
-            const order = [2, 1, 0, 3, 4];
-            const indexA = order.indexOf(numA);
-            const indexB = order.indexOf(numB);
-            
-            // If both found in order array, sort by position
-            if (indexA !== -1 && indexB !== -1) {
-              return indexA - indexB;
+    function OpenCVPanorama() {
+      const [images, setImages] = useState([]);
+      const [panorama, setPanorama] = useState(null);
+      const [processing, setProcessing] = useState(false);
+      const [progress, setProgress] = useState("");
+      const [opencvReady, setOpencvReady] = useState(false);
+      const [statusLog, setStatusLog] = useState([]);
+
+      useEffect(() => {
+        addLog("Initializing application...");
+        if (window.cv && window.cv.Mat) {
+          setOpencvReady(true);
+          addLog("✓ OpenCV loaded successfully!");
+        } else {
+          addLog("⏳ Loading OpenCV library...");
+          const checkOpenCV = setInterval(() => {
+            if (window.cv && window.cv.Mat) {
+              setOpencvReady(true);
+              addLog("✓ OpenCV loaded successfully!");
+              clearInterval(checkOpenCV);
             }
-            // Otherwise, fallback to alphabetical
-            return a.name.localeCompare(b.name);
-          });
-          
-          const newImages = files.map((file, idx) => ({
-            id: Date.now() + idx,
-            file,
-            url: URL.createObjectURL(file),
-            name: file.name,
-          }));
-          setImages([...images, ...newImages]);
-          addLog(`✓ Uploaded ${files.length} image(s)`);
-        };
+          }, 100);
+        }
+      }, []);
 
-        const moveImage = (index, direction) => {
-          const newImages = [...images];
-          const newIndex = direction === "up" ? index - 1 : index + 1;
-          if (newIndex >= 0 && newIndex < newImages.length) {
-            [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
-            setImages(newImages);
+      const addLog = (message) => {
+        setStatusLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
+      };
+
+      const handleImageUpload = (e) => {
+        const files = Array.from(e.target.files);
+
+        // Extract numbers from filenames and sort: DSC02932 -> 2, DSC02931 -> 1, etc.
+        files.sort((a, b) => {
+          // Extract the last digit before the extension
+          const numA = parseInt(a.name.replace(/\D/g, '').slice(-1));
+          const numB = parseInt(b.name.replace(/\D/g, '').slice(-1));
+
+          // Custom order: 2, 1, 0, 3, 4 (bottom to top in display)
+          const order = [2, 1, 0, 3, 4];
+          const indexA = order.indexOf(numA);
+          const indexB = order.indexOf(numB);
+
+          // If both found in order array, sort by position
+          if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
           }
-        };
+          // Otherwise, fallback to alphabetical
+          return a.name.localeCompare(b.name);
+        });
 
-        const removeImage = (index) => {
-          const newImages = images.filter((_, i) => i !== index);
+        const newImages = files.map((file, idx) => ({
+          id: Date.now() + idx,
+          file,
+          url: URL.createObjectURL(file),
+          name: file.name,
+        }));
+        setImages([...images, ...newImages]);
+        addLog(`✓ Uploaded ${files.length} image(s)`);
+      };
+
+      const moveImage = (index, direction) => {
+        const newImages = [...images];
+        const newIndex = direction === "up" ? index - 1 : index + 1;
+        if (newIndex >= 0 && newIndex < newImages.length) {
+          [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
           setImages(newImages);
-        };
+        }
+      };
 
-        const loadImage = (url) => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = url;
-          });
-        };
+      const removeImage = (index) => {
+        const newImages = images.filter((_, i) => i !== index);
+        setImages(newImages);
+      };
 
-        const createLinearBlendMask = (height, width, barrier, smoothingWindow, leftBiased) => {
-          const mask = new cv.Mat(height, width, cv.CV_32F, new cv.Scalar(0));
-          const offset = Math.floor(smoothingWindow / 2);
-          
-          if (leftBiased) {
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                if (x < barrier - offset) {
-                  mask.floatPtr(y, x)[0] = 1.0;
-                } else if (x >= barrier - offset && x <= barrier + offset) {
-                  const ratio = (barrier + offset - x) / (2 * offset);
-                  mask.floatPtr(y, x)[0] = Math.max(0, Math.min(1, ratio));
-                }
-              }
-            }
-          } else {
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                if (x > barrier + offset) {
-                  mask.floatPtr(y, x)[0] = 1.0;
-                } else if (x >= barrier - offset && x <= barrier + offset) {
-                  const ratio = (x - (barrier - offset)) / (2 * offset);
-                  mask.floatPtr(y, x)[0] = Math.max(0, Math.min(1, ratio));
-                }
+      const loadImage = (url) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = url;
+        });
+      };
+
+      const createLinearBlendMask = (height, width, barrier, smoothingWindow, leftBiased) => {
+        const mask = new cv.Mat(height, width, cv.CV_32F, new cv.Scalar(0));
+        const offset = Math.floor(smoothingWindow / 2);
+
+        if (leftBiased) {
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              if (x < barrier - offset) {
+                mask.floatPtr(y, x)[0] = 1.0;
+              } else if (x >= barrier - offset && x <= barrier + offset) {
+                const ratio = (barrier + offset - x) / (2 * offset);
+                mask.floatPtr(y, x)[0] = Math.max(0, Math.min(1, ratio));
               }
             }
           }
-          
-          return mask;
-        };
-
-        const cropPanorama = (pano, h_dst, corners) => {
-          const min_x = Math.floor(Math.min(...corners.map(c => c[0])));
-          const max_x = Math.ceil(Math.max(...corners.map(c => c[0])));
-          const min_y = Math.floor(Math.min(...corners.map(c => c[1])));
-          const max_y = Math.ceil(Math.max(...corners.map(c => c[1])));
-          
-          const t_x = -min_x;
-          const t_y = -min_y;
-          
-          let crop_x_start = 0;
-          let crop_x_end = pano.cols;
-          let crop_y_start = t_y;
-          let crop_y_end = Math.min(t_y + h_dst, pano.rows);
-          
-          if (corners[0][0] < 0) {
-            const n = Math.abs(corners[1][0] - corners[0][0]);
-            crop_x_start = Math.max(0, Math.floor(n));
-          } else {
-            const end_x = Math.min(corners[2][0], corners[3][0]);
-            crop_x_end = Math.min(pano.cols, Math.ceil(end_x));
-          }
-          
-          crop_x_start = Math.max(0, crop_x_start);
-          crop_x_end = Math.min(pano.cols, crop_x_end);
-          crop_y_start = Math.max(0, crop_y_start);
-          crop_y_end = Math.min(pano.rows, crop_y_end);
-          
-          const width = crop_x_end - crop_x_start;
-          const height = crop_y_end - crop_y_start;
-          
-          if (width <= 0 || height <= 0) {
-            return pano;
-          }
-          
-          const rect = new cv.Rect(crop_x_start, crop_y_start, width, height);
-          const cropped = pano.roi(rect);
-          const result = cropped.clone();
-          cropped.delete();
-          
-          return result;
-        };
-
-        const stitchTwoImages = async (dst_img, src_img, imageNum) => {
-          addLog(`Processing image pair ${imageNum}...`);
-          
-          // Allow UI to update
-          await new Promise(resolve => setTimeout(resolve, 50));
-
-          const gray_dst = new cv.Mat();
-          const gray_src = new cv.Mat();
-          cv.cvtColor(dst_img, gray_dst, cv.COLOR_RGBA2GRAY);
-          cv.cvtColor(src_img, gray_src, cv.COLOR_RGBA2GRAY);
-
-          addLog(`  → Detecting ORB features (2000 features)...`);
-          const orb = new cv.ORB(2000);
-          const kp_dst = new cv.KeyPointVector();
-          const kp_src = new cv.KeyPointVector();
-          const desc_dst = new cv.Mat();
-          const desc_src = new cv.Mat();
-
-          orb.detectAndCompute(gray_dst, new cv.Mat(), kp_dst, desc_dst);
-          orb.detectAndCompute(gray_src, new cv.Mat(), kp_src, desc_src);
-
-          addLog(`  → Found ${kp_dst.size()} and ${kp_src.size()} keypoints`);
-
-          if (kp_dst.size() < 4 || kp_src.size() < 4) {
-            throw new Error("Not enough features detected");
-          }
-
-          addLog(`  → Matching features with Lowe's ratio test (0.75)...`);
-          const bf = new cv.BFMatcher(cv.NORM_HAMMING, false);
-          const matches = new cv.DMatchVectorVector();
-          bf.knnMatch(desc_src, desc_dst, matches, 2);
-
-          const good_matches = [];
-          for (let i = 0; i < matches.size(); i++) {
-            const match_pair = matches.get(i);
-            if (match_pair.size() >= 2) {
-              const m = match_pair.get(0);
-              const n = match_pair.get(1);
-              if (m.distance < 0.75 * n.distance) {
-                good_matches.push(m);
+        } else {
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              if (x > barrier + offset) {
+                mask.floatPtr(y, x)[0] = 1.0;
+              } else if (x >= barrier - offset && x <= barrier + offset) {
+                const ratio = (x - (barrier - offset)) / (2 * offset);
+                mask.floatPtr(y, x)[0] = Math.max(0, Math.min(1, ratio));
               }
             }
           }
+        }
 
-          addLog(`  → Found ${good_matches.length} good matches`);
+        return mask;
+      };
 
-          if (good_matches.length < 4) {
-            throw new Error("Not enough good matches - check image overlap");
+      const cropPanorama = (pano, h_dst, corners) => {
+        const min_x = Math.floor(Math.min(...corners.map(c => c[0])));
+        const max_x = Math.ceil(Math.max(...corners.map(c => c[0])));
+        const min_y = Math.floor(Math.min(...corners.map(c => c[1])));
+        const max_y = Math.ceil(Math.max(...corners.map(c => c[1])));
+
+        const t_x = -min_x;
+        const t_y = -min_y;
+
+        let crop_x_start = 0;
+        let crop_x_end = pano.cols;
+        let crop_y_start = t_y;
+        let crop_y_end = Math.min(t_y + h_dst, pano.rows);
+
+        if (corners[0][0] < 0) {
+          const n = Math.abs(corners[1][0] - corners[0][0]);
+          crop_x_start = Math.max(0, Math.floor(n));
+        } else {
+          const end_x = Math.min(corners[2][0], corners[3][0]);
+          crop_x_end = Math.min(pano.cols, Math.ceil(end_x));
+        }
+
+        crop_x_start = Math.max(0, crop_x_start);
+        crop_x_end = Math.min(pano.cols, crop_x_end);
+        crop_y_start = Math.max(0, crop_y_start);
+        crop_y_end = Math.min(pano.rows, crop_y_end);
+
+        const width = crop_x_end - crop_x_start;
+        const height = crop_y_end - crop_y_start;
+
+        if (width <= 0 || height <= 0) {
+          return pano;
+        }
+
+        const rect = new cv.Rect(crop_x_start, crop_y_start, width, height);
+        const cropped = pano.roi(rect);
+        const result = cropped.clone();
+        cropped.delete();
+
+        return result;
+      };
+
+      const stitchTwoImages = async (dst_img, src_img, imageNum) => {
+        addLog(`Processing image pair ${imageNum}...`);
+
+        // Allow UI to update
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const gray_dst = new cv.Mat();
+        const gray_src = new cv.Mat();
+        cv.cvtColor(dst_img, gray_dst, cv.COLOR_RGBA2GRAY);
+        cv.cvtColor(src_img, gray_src, cv.COLOR_RGBA2GRAY);
+
+        addLog(`  → Detecting ORB features (2000 features)...`);
+        const orb = new cv.ORB(2000);
+        const kp_dst = new cv.KeyPointVector();
+        const kp_src = new cv.KeyPointVector();
+        const desc_dst = new cv.Mat();
+        const desc_src = new cv.Mat();
+
+        orb.detectAndCompute(gray_dst, new cv.Mat(), kp_dst, desc_dst);
+        orb.detectAndCompute(gray_src, new cv.Mat(), kp_src, desc_src);
+
+        addLog(`  → Found ${kp_dst.size()} and ${kp_src.size()} keypoints`);
+
+        if (kp_dst.size() < 4 || kp_src.size() < 4) {
+          throw new Error("Not enough features detected");
+        }
+
+        addLog(`  → Matching features with Lowe's ratio test (0.75)...`);
+        const bf = new cv.BFMatcher(cv.NORM_HAMMING, false);
+        const matches = new cv.DMatchVectorVector();
+        bf.knnMatch(desc_src, desc_dst, matches, 2);
+
+        const good_matches = [];
+        for (let i = 0; i < matches.size(); i++) {
+          const match_pair = matches.get(i);
+          if (match_pair.size() >= 2) {
+            const m = match_pair.get(0);
+            const n = match_pair.get(1);
+            if (m.distance < 0.75 * n.distance) {
+              good_matches.push(m);
+            }
           }
+        }
 
-          const src_pts = [];
-          const dst_pts = [];
-          for (let m of good_matches) {
-            const kp1 = kp_src.get(m.queryIdx);
-            const kp2 = kp_dst.get(m.trainIdx);
-            src_pts.push(kp1.pt.x, kp1.pt.y);
-            dst_pts.push(kp2.pt.x, kp2.pt.y);
+        addLog(`  → Found ${good_matches.length} good matches`);
+
+        if (good_matches.length < 4) {
+          throw new Error("Not enough good matches - check image overlap");
+        }
+
+        const src_pts = [];
+        const dst_pts = [];
+        for (let m of good_matches) {
+          const kp1 = kp_src.get(m.queryIdx);
+          const kp2 = kp_dst.get(m.trainIdx);
+          src_pts.push(kp1.pt.x, kp1.pt.y);
+          dst_pts.push(kp2.pt.x, kp2.pt.y);
+        }
+
+        const src_mat = cv.matFromArray(good_matches.length, 1, cv.CV_32FC2, src_pts);
+        const dst_mat = cv.matFromArray(good_matches.length, 1, cv.CV_32FC2, dst_pts);
+
+        addLog(`  → Computing homography with RANSAC (5.0)...`);
+        const mask = new cv.Mat();
+        const H = cv.findHomography(src_mat, dst_mat, cv.RANSAC, 5.0, mask);
+
+        let inlierCount = 0;
+        for (let i = 0; i < mask.rows; i++) {
+          if (mask.ucharAt(i, 0) > 0) inlierCount++;
+        }
+        addLog(`  → Inliers: ${inlierCount}/${good_matches.length}`);
+
+        const h_src = src_img.rows;
+        const w_src = src_img.cols;
+        const h_dst = dst_img.rows;
+        const w_dst = dst_img.cols;
+
+        const pts1 = [
+          [0, 0],
+          [0, h_src],
+          [w_src, h_src],
+          [w_src, 0]
+        ];
+
+        const pts1_mat = cv.matFromArray(4, 1, cv.CV_32FC2, pts1.flat());
+        const pts1_transformed = new cv.Mat();
+        cv.perspectiveTransform(pts1_mat, pts1_transformed, H);
+
+        const corners_src = [];
+        for (let i = 0; i < 4; i++) {
+          corners_src.push([pts1_transformed.floatAt(i, 0), pts1_transformed.floatAt(i, 1)]);
+        }
+
+        const corners_dst = [
+          [0, 0],
+          [0, h_dst],
+          [w_dst, h_dst],
+          [w_dst, 0]
+        ];
+
+        const all_corners = [...corners_src, ...corners_dst];
+
+        let min_x = Math.min(...all_corners.map(c => c[0]));
+        let max_x = Math.max(...all_corners.map(c => c[0]));
+        let min_y = Math.min(...all_corners.map(c => c[1]));
+        let max_y = Math.max(...all_corners.map(c => c[1]));
+
+        const t_x = -min_x;
+        const t_y = -min_y;
+
+        let side = corners_src[0][0] < 0 ? "left" : "right";
+
+        const width_pano = side === "left" ? Math.ceil(w_dst + t_x) : Math.ceil(corners_src[3][0]);
+        const height_pano = Math.ceil(max_y - min_y);
+
+        addLog(`  → Canvas: ${width_pano}x${height_pano}px (side: ${side})`);
+
+        const Ht = cv.Mat.eye(3, 3, cv.CV_64F);
+        Ht.doublePtr(0, 2)[0] = t_x;
+        Ht.doublePtr(1, 2)[0] = t_y;
+
+        const H_final = new cv.Mat();
+        cv.gemm(Ht, H, 1, new cv.Mat(), 0, H_final);
+
+        const src_warped = new cv.Mat();
+        cv.warpPerspective(src_img, src_warped, H_final, new cv.Size(width_pano, height_pano), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar(0, 0, 0, 0));
+
+        const dst_resized = new cv.Mat(height_pano, width_pano, cv.CV_8UC3, new cv.Scalar(0, 0, 0));
+
+        const dst_x = side === "left" ? Math.round(t_x) : 0;
+        const dst_y = Math.round(t_y);
+
+        for (let y = 0; y < h_dst; y++) {
+          for (let x = 0; x < w_dst; x++) {
+            const target_y = y + dst_y;
+            const target_x = x + dst_x;
+            if (target_y >= 0 && target_y < height_pano && target_x >= 0 && target_x < width_pano) {
+              const src_ptr = dst_img.ucharPtr(y, x);
+              const dst_ptr = dst_resized.ucharPtr(target_y, target_x);
+              for (let c = 0; c < 3; c++) {
+                dst_ptr[c] = src_ptr[c];
+              }
+            }
           }
+        }
 
-          const src_mat = cv.matFromArray(good_matches.length, 1, cv.CV_32FC2, src_pts);
-          const dst_mat = cv.matFromArray(good_matches.length, 1, cv.CV_32FC2, dst_pts);
+        addLog(`  → Advanced multi-band blending...`);
 
-          addLog(`  → Computing homography with RANSAC (5.0)...`);
-          const mask = new cv.Mat();
-          const H = cv.findHomography(src_mat, dst_mat, cv.RANSAC, 5.0, mask);
+        const pano = new cv.Mat(height_pano, width_pano, cv.CV_8UC3, new cv.Scalar(0, 0, 0));
 
-          let inlierCount = 0;
-          for (let i = 0; i < mask.rows; i++) {
-            if (mask.ucharAt(i, 0) > 0) inlierCount++;
+        // Create masks for overlap detection
+        const mask_dst = new cv.Mat(height_pano, width_pano, cv.CV_8U, new cv.Scalar(0));
+        const mask_src = new cv.Mat(height_pano, width_pano, cv.CV_8U, new cv.Scalar(0));
+
+        // Mark valid pixels
+        for (let y = 0; y < height_pano; y++) {
+          for (let x = 0; x < width_pano; x++) {
+            const dst_pix = dst_resized.ucharPtr(y, x);
+            const src_pix = src_warped.ucharPtr(y, x);
+
+            if (dst_pix[0] + dst_pix[1] + dst_pix[2] > 10) {
+              mask_dst.ucharPtr(y, x)[0] = 255;
+            }
+            if (src_pix[3] > 10) {
+              mask_src.ucharPtr(y, x)[0] = 255;
+            }
           }
-          addLog(`  → Inliers: ${inlierCount}/${good_matches.length}`);
+        }
 
-          const h_src = src_img.rows;
-          const w_src = src_img.cols;
-          const h_dst = dst_img.rows;
-          const w_dst = dst_img.cols;
+        // Find overlap region
+        const overlap = new cv.Mat();
+        cv.bitwise_and(mask_dst, mask_src, overlap);
 
-          const pts1 = [
-            [0, 0],
-            [0, h_src],
-            [w_src, h_src],
-            [w_src, 0]
-          ];
+        // Erode masks slightly for better blending
+        const kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
+        cv.erode(mask_dst, mask_dst, kernel);
+        cv.erode(mask_src, mask_src, kernel);
+        cv.erode(overlap, overlap, kernel);
 
-          const pts1_mat = cv.matFromArray(4, 1, cv.CV_32FC2, pts1.flat());
-          const pts1_transformed = new cv.Mat();
-          cv.perspectiveTransform(pts1_mat, pts1_transformed, H);
+        // Distance transform for smooth blending
+        const dist_dst = new cv.Mat();
+        const dist_src = new cv.Mat();
+        cv.distanceTransform(mask_dst, dist_dst, cv.DIST_L2, 3);
+        cv.distanceTransform(mask_src, dist_src, cv.DIST_L2, 3);
 
-          const corners_src = [];
-          for (let i = 0; i < 4; i++) {
-            corners_src.push([pts1_transformed.floatAt(i, 0), pts1_transformed.floatAt(i, 1)]);
-          }
+        // Apply Gaussian blur to distance transforms for smoother blending
+        cv.GaussianBlur(dist_dst, dist_dst, new cv.Size(11, 11), 0);
+        cv.GaussianBlur(dist_src, dist_src, new cv.Size(11, 11), 0);
 
-          const corners_dst = [
-            [0, 0],
-            [0, h_dst],
-            [w_dst, h_dst],
-            [w_dst, 0]
-          ];
+        // Blend images
+        for (let y = 0; y < height_pano; y++) {
+          for (let x = 0; x < width_pano; x++) {
+            const dst_pix = dst_resized.ucharPtr(y, x);
+            const src_pix = src_warped.ucharPtr(y, x);
+            const pano_pix = pano.ucharPtr(y, x);
 
-          const all_corners = [...corners_src, ...corners_dst];
-          
-          let min_x = Math.min(...all_corners.map(c => c[0]));
-          let max_x = Math.max(...all_corners.map(c => c[0]));
-          let min_y = Math.min(...all_corners.map(c => c[1]));
-          let max_y = Math.max(...all_corners.map(c => c[1]));
+            const has_dst = mask_dst.ucharPtr(y, x)[0] > 0;
+            const has_src = mask_src.ucharPtr(y, x)[0] > 0;
+            const in_overlap = overlap.ucharPtr(y, x)[0] > 0;
 
-          const t_x = -min_x;
-          const t_y = -min_y;
-          
-          let side = corners_src[0][0] < 0 ? "left" : "right";
-          
-          const width_pano = side === "left" ? Math.ceil(w_dst + t_x) : Math.ceil(corners_src[3][0]);
-          const height_pano = Math.ceil(max_y - min_y);
+            if (in_overlap) {
+              const d_dst = dist_dst.floatAt(y, x);
+              const d_src = dist_src.floatAt(y, x);
+              const total = d_dst + d_src;
 
-          addLog(`  → Canvas: ${width_pano}x${height_pano}px (side: ${side})`);
+              if (total > 0.01) {
+                const w_dst = d_dst / total;
+                const w_src = d_src / total;
 
-          const Ht = cv.Mat.eye(3, 3, cv.CV_64F);
-          Ht.doublePtr(0, 2)[0] = t_x;
-          Ht.doublePtr(1, 2)[0] = t_y;
-
-          const H_final = new cv.Mat();
-          cv.gemm(Ht, H, 1, new cv.Mat(), 0, H_final);
-
-          const src_warped = new cv.Mat();
-          cv.warpPerspective(src_img, src_warped, H_final, new cv.Size(width_pano, height_pano), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar(0, 0, 0, 0));
-
-          const dst_resized = new cv.Mat(height_pano, width_pano, cv.CV_8UC3, new cv.Scalar(0, 0, 0));
-          
-          const dst_x = side === "left" ? Math.round(t_x) : 0;
-          const dst_y = Math.round(t_y);
-          
-          for (let y = 0; y < h_dst; y++) {
-            for (let x = 0; x < w_dst; x++) {
-              const target_y = y + dst_y;
-              const target_x = x + dst_x;
-              if (target_y >= 0 && target_y < height_pano && target_x >= 0 && target_x < width_pano) {
-                const src_ptr = dst_img.ucharPtr(y, x);
-                const dst_ptr = dst_resized.ucharPtr(target_y, target_x);
                 for (let c = 0; c < 3; c++) {
-                  dst_ptr[c] = src_ptr[c];
+                  pano_pix[c] = Math.round(dst_pix[c] * w_dst + src_pix[c] * w_src);
                 }
-              }
-            }
-          }
-
-          addLog(`  → Advanced multi-band blending...`);
-          
-          const pano = new cv.Mat(height_pano, width_pano, cv.CV_8UC3, new cv.Scalar(0, 0, 0));
-          
-          // Create masks for overlap detection
-          const mask_dst = new cv.Mat(height_pano, width_pano, cv.CV_8U, new cv.Scalar(0));
-          const mask_src = new cv.Mat(height_pano, width_pano, cv.CV_8U, new cv.Scalar(0));
-          
-          // Mark valid pixels
-          for (let y = 0; y < height_pano; y++) {
-            for (let x = 0; x < width_pano; x++) {
-              const dst_pix = dst_resized.ucharPtr(y, x);
-              const src_pix = src_warped.ucharPtr(y, x);
-              
-              if (dst_pix[0] + dst_pix[1] + dst_pix[2] > 10) {
-                mask_dst.ucharPtr(y, x)[0] = 255;
-              }
-              if (src_pix[3] > 10) {
-                mask_src.ucharPtr(y, x)[0] = 255;
-              }
-            }
-          }
-          
-          // Find overlap region
-          const overlap = new cv.Mat();
-          cv.bitwise_and(mask_dst, mask_src, overlap);
-          
-          // Erode masks slightly for better blending
-          const kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
-          cv.erode(mask_dst, mask_dst, kernel);
-          cv.erode(mask_src, mask_src, kernel);
-          cv.erode(overlap, overlap, kernel);
-          
-          // Distance transform for smooth blending
-          const dist_dst = new cv.Mat();
-          const dist_src = new cv.Mat();
-          cv.distanceTransform(mask_dst, dist_dst, cv.DIST_L2, 3);
-          cv.distanceTransform(mask_src, dist_src, cv.DIST_L2, 3);
-          
-          // Apply Gaussian blur to distance transforms for smoother blending
-          cv.GaussianBlur(dist_dst, dist_dst, new cv.Size(11, 11), 0);
-          cv.GaussianBlur(dist_src, dist_src, new cv.Size(11, 11), 0);
-          
-          // Blend images
-          for (let y = 0; y < height_pano; y++) {
-            for (let x = 0; x < width_pano; x++) {
-              const dst_pix = dst_resized.ucharPtr(y, x);
-              const src_pix = src_warped.ucharPtr(y, x);
-              const pano_pix = pano.ucharPtr(y, x);
-              
-              const has_dst = mask_dst.ucharPtr(y, x)[0] > 0;
-              const has_src = mask_src.ucharPtr(y, x)[0] > 0;
-              const in_overlap = overlap.ucharPtr(y, x)[0] > 0;
-              
-              if (in_overlap) {
-                const d_dst = dist_dst.floatAt(y, x);
-                const d_src = dist_src.floatAt(y, x);
-                const total = d_dst + d_src;
-                
-                if (total > 0.01) {
-                  const w_dst = d_dst / total;
-                  const w_src = d_src / total;
-                  
-                  for (let c = 0; c < 3; c++) {
-                    pano_pix[c] = Math.round(dst_pix[c] * w_dst + src_pix[c] * w_src);
-                  }
-                } else {
-                  for (let c = 0; c < 3; c++) {
-                    pano_pix[c] = Math.round((dst_pix[c] + src_pix[c]) / 2);
-                  }
-                }
-              } else if (has_dst) {
+              } else {
                 for (let c = 0; c < 3; c++) {
-                  pano_pix[c] = dst_pix[c];
+                  pano_pix[c] = Math.round((dst_pix[c] + src_pix[c]) / 2);
                 }
-              } else if (src_pix[3] > 10) {
-                for (let c = 0; c < 3; c++) {
-                  pano_pix[c] = src_pix[c];
-                }
+              }
+            } else if (has_dst) {
+              for (let c = 0; c < 3; c++) {
+                pano_pix[c] = dst_pix[c];
+              }
+            } else if (src_pix[3] > 10) {
+              for (let c = 0; c < 3; c++) {
+                pano_pix[c] = src_pix[c];
               }
             }
           }
-          
-          mask_dst.delete();
-          mask_src.delete();
-          overlap.delete();
-          kernel.delete();
-          dist_dst.delete();
-          dist_src.delete();
+        }
 
-          addLog(`  → Cropping to content...`);
-          const cropped_pano = cropPanorama(pano, h_dst, corners_src);
+        mask_dst.delete();
+        mask_src.delete();
+        overlap.delete();
+        kernel.delete();
+        dist_dst.delete();
+        dist_src.delete();
 
-          gray_dst.delete();
-          gray_src.delete();
-          kp_dst.delete();
-          kp_src.delete();
-          desc_dst.delete();
-          desc_src.delete();
-          matches.delete();
-          src_mat.delete();
-          dst_mat.delete();
-          mask.delete();
-          H.delete();
-          pts1_mat.delete();
-          pts1_transformed.delete();
-          Ht.delete();
-          H_final.delete();
-          src_warped.delete();
-          dst_resized.delete();
-          pano.delete();
+        addLog(`  → Cropping to content...`);
+        const cropped_pano = cropPanorama(pano, h_dst, corners_src);
 
-          addLog(`  ✓ Stitched pair ${imageNum}`);
-          return cropped_pano;
-        };
+        gray_dst.delete();
+        gray_src.delete();
+        kp_dst.delete();
+        kp_src.delete();
+        desc_dst.delete();
+        desc_src.delete();
+        matches.delete();
+        src_mat.delete();
+        dst_mat.delete();
+        mask.delete();
+        H.delete();
+        pts1_mat.delete();
+        pts1_transformed.delete();
+        Ht.delete();
+        H_final.delete();
+        src_warped.delete();
+        dst_resized.delete();
+        pano.delete();
 
-        const stitchWithOpenCV = async () => {
-          if (images.length < 2) {
-            alert("Please upload at least 2 images");
-            return;
-          }
+        addLog(`  ✓ Stitched pair ${imageNum}`);
+        return cropped_pano;
+      };
 
-          if (!opencvReady) {
-            alert("OpenCV is still loading...");
-            return;
-          }
+      const stitchWithOpenCV = async () => {
+        if (images.length < 2) {
+          alert("Please upload at least 2 images");
+          return;
+        }
 
-          setProcessing(true);
-          setPanorama(null);
-          setStatusLog([]);
-          setProgress("Starting...");
-          addLog("=== PANORAMA STITCHING STARTED ===");
+        if (!opencvReady) {
+          alert("OpenCV is still loading...");
+          return;
+        }
 
-          try {
-            setProgress("Loading images...");
-            const loadedImages = await Promise.all(images.map((img) => loadImage(img.url)));
-            addLog(`✓ Loaded ${loadedImages.length} images`);
+        setProcessing(true);
+        setPanorama(null);
+        setStatusLog([]);
+        setProgress("Starting...");
+        addLog("=== PANORAMA STITCHING STARTED ===");
 
-            setProgress("Converting to OpenCV...");
-            const mats = loadedImages.map((img, idx) => {
-              const canvas = document.createElement("canvas");
-              const maxDim = 800;
-              let width = img.width;
-              let height = img.height;
-              
-              if (width > maxDim || height > maxDim) {
-                const scale = Math.min(maxDim / width, maxDim / height);
-                width = Math.floor(width * scale);
-                height = Math.floor(height * scale);
-              }
-              
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext("2d", { alpha: false });
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = 'high';
-              ctx.drawImage(img, 0, 0, width, height);
-              addLog(`  → Image ${idx + 1}: ${width}x${height}px`);
-              return cv.imread(canvas);
-            });
+        try {
+          setProgress("Loading images...");
+          const loadedImages = await Promise.all(images.map((img) => loadImage(img.url)));
+          addLog(`✓ Loaded ${loadedImages.length} images`);
 
-            setProgress("Stitching panorama...");
-            let panorama = mats[0].clone();
-
-            for (let i = 1; i < mats.length; i++) {
-              setProgress(`Stitching image ${i + 1} of ${mats.length}...`);
-              panorama = await stitchTwoImages(panorama, mats[i], i);
-            }
-
-            setProgress("Generating high-quality output...");
+          setProgress("Converting to OpenCV...");
+          const mats = loadedImages.map((img, idx) => {
             const canvas = document.createElement("canvas");
-            cv.imshow(canvas, panorama);
+            const maxDim = 800;
+            let width = img.width;
+            let height = img.height;
 
-            canvas.toBlob((blob) => {
-              const url = URL.createObjectURL(blob);
-              setPanorama(url);
-              addLog(`✓ Complete! Final size: ${canvas.width}x${canvas.height}px`);
-              setProcessing(false);
-            }, 'image/png', 1.0);
+            if (width > maxDim || height > maxDim) {
+              const scale = Math.min(maxDim / width, maxDim / height);
+              width = Math.floor(width * scale);
+              height = Math.floor(height * scale);
+            }
 
-            mats.forEach((mat) => mat.delete());
-            panorama.delete();
-          } catch (error) {
-            setProgress("Error");
-            addLog(`❌ ${error.message}`);
-            console.error("Full error:", error);
-            alert(`Error: ${error.message}`);
-            setProcessing(false);
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d", { alpha: false });
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, width, height);
+            addLog(`  → Image ${idx + 1}: ${width}x${height}px`);
+            return cv.imread(canvas);
+          });
+
+          setProgress("Stitching panorama...");
+          let panorama = mats[0].clone();
+
+          for (let i = 1; i < mats.length; i++) {
+            setProgress(`Stitching image ${i + 1} of ${mats.length}...`);
+            panorama = await stitchTwoImages(panorama, mats[i], i);
           }
-        };
 
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 md:p-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-bold mb-3">Panoramic Stitcher</h1>
-                <p className="text-gray-400 text-base md:text-lg">
-                  Create stunning panoramic images with precision alignment
-                </p>
-                {!opencvReady && (
-                  <div className="mt-6 flex items-center justify-center gap-2 text-amber-400">
-                    <Loader />
-                    <span>Loading OpenCV...</span>
-                  </div>
-                )}
-                {opencvReady && (
-                  <div className="mt-6 text-emerald-400 font-semibold">✓ Ready</div>
-                )}
-              </div>
+          setProgress("Generating high-quality output...");
+          const canvas = document.createElement("canvas");
+          cv.imshow(canvas, panorama);
 
-              <div className="flex justify-center mb-12">
-                <label className="flex flex-col items-center justify-center cursor-pointer bg-white/5 hover:bg-white/10 transition-all rounded-2xl border-2 border-dashed border-white/30 hover:border-white/50" style={{width: '650px', height: '650px'}}>
-                  <Upload />
-                  <span className="text-xl font-semibold mb-2">Upload Images</span>
-                  <span className="text-sm text-gray-400 text-center px-4">
-                    Upload 2-10 images from left to right with 30-50% overlap for best results
-                  </span>
-                  <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" disabled={!opencvReady} />
-                </label>
-              </div>
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            setPanorama(url);
+            addLog(`✓ Complete! Final size: ${canvas.width}x${canvas.height}px`);
+            setProcessing(false);
+          }, 'image/png', 1.0);
 
-              {images.length > 0 && (
-                <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 mb-8">
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-6">Images ({images.length})</h2>
-                  <div className="space-y-3">
-                    {images.map((img, index) => (
-                      <div key={img.id} className="flex items-center gap-3 md:gap-5 bg-white/5 p-3 md:p-4 rounded-xl border border-white/10">
-                        <div className="flex flex-col gap-1">
-                          <button onClick={() => moveImage(index, "up")} disabled={index === 0} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 disabled:opacity-30">
-                            <ArrowUp />
-                          </button>
-                          <button onClick={() => moveImage(index, "down")} disabled={index === images.length - 1} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 disabled:opacity-30">
-                            <ArrowDown />
-                          </button>
-                        </div>
-                        <span className="text-2xl font-bold text-white/50 w-8">{index + 1}</span>
-                        <img src={img.url} alt={img.name} className="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg" />
-                        <span className="flex-1 truncate text-sm md:text-base text-gray-300">{img.name}</span>
-                        <button onClick={() => removeImage(index)} className="p-2 bg-red-500/20 rounded-lg hover:bg-red-500/40 text-red-400">
-                          <Trash />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+          mats.forEach((mat) => mat.delete());
+          panorama.delete();
+        } catch (error) {
+          setProgress("Error");
+          addLog(`❌ ${error.message}`);
+          console.error("Full error:", error);
+          alert(`Error: ${error.message}`);
+          setProcessing(false);
+        }
+      };
 
-                  <button onClick={stitchWithOpenCV} disabled={processing || !opencvReady || images.length < 2} className="mt-8 w-full bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                    {processing ? (
-                      <>
-                        <Loader />
-                        <span>{progress}</span>
-                      </>
-                    ) : (
-                      "Create Panorama"
-                    )}
-                  </button>
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 md:p-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">Panoramic Stitcher</h1>
+              <p className="text-gray-400 text-base md:text-lg">
+                Create stunning panoramic images with precision alignment
+              </p>
+              {!opencvReady && (
+                <div className="mt-6 flex items-center justify-center gap-2 text-amber-400">
+                  <Loader />
+                  <span>Loading OpenCV...</span>
                 </div>
               )}
-
-              {panorama && (
-                <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 mb-8">
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-6">Panorama Generated</h2>
-                  <div className="scroll-container bg-black/50 rounded-xl p-2 mb-6">
-                    <img src={panorama} alt="Panorama" className="h-96 rounded-lg shadow-2xl" />
-                  </div>
-                  <a href={panorama} download="panorama.png" className="inline-flex items-center gap-2 bg-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700">
-                    <Download />
-                    Download Panorama
-                  </a>
-                </div>
+              {opencvReady && (
+                <div className="mt-6 text-emerald-400 font-semibold">✓ Ready</div>
               )}
             </div>
-          </div>
-        );
-      }
 
-      ReactDOM.render(<OpenCVPanorama />, document.getElementById("root"));
-    </script>
-  </body>
+            <div className="flex justify-center mb-12">
+              <label className="flex flex-col items-center justify-center cursor-pointer bg-white/5 hover:bg-white/10 transition-all rounded-2xl border-2 border-dashed border-white/30 hover:border-white/50" style={{ width: '650px', height: '650px' }}>
+                <Upload />
+                <span className="text-xl font-semibold mb-2">Upload Images</span>
+                <span className="text-sm text-gray-400 text-center px-4">
+                  Upload 2-10 images from left to right with 30-50% overlap for best results
+                </span>
+                <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" disabled={!opencvReady} />
+              </label>
+            </div>
+
+            {images.length > 0 && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 mb-8">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-6">Images ({images.length})</h2>
+                <div className="space-y-3">
+                  {images.map((img, index) => (
+                    <div key={img.id} className="flex items-center gap-3 md:gap-5 bg-white/5 p-3 md:p-4 rounded-xl border border-white/10">
+                      <div className="flex flex-col gap-1">
+                        <button onClick={() => moveImage(index, "up")} disabled={index === 0} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 disabled:opacity-30">
+                          <ArrowUp />
+                        </button>
+                        <button onClick={() => moveImage(index, "down")} disabled={index === images.length - 1} className="p-2 bg-white/10 rounded-lg hover:bg-white/20 disabled:opacity-30">
+                          <ArrowDown />
+                        </button>
+                      </div>
+                      <span className="text-2xl font-bold text-white/50 w-8">{index + 1}</span>
+                      <img src={img.url} alt={img.name} className="w-20 h-20 md:w-28 md:h-28 object-cover rounded-lg" />
+                      <span className="flex-1 truncate text-sm md:text-base text-gray-300">{img.name}</span>
+                      <button onClick={() => removeImage(index)} className="p-2 bg-red-500/20 rounded-lg hover:bg-red-500/40 text-red-400">
+                        <Trash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={stitchWithOpenCV} disabled={processing || !opencvReady || images.length < 2} className="mt-8 w-full bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+                  {processing ? (
+                    <>
+                      <Loader />
+                      <span>{progress}</span>
+                    </>
+                  ) : (
+                    "Create Panorama"
+                  )}
+                </button>
+              </div>
+            )}
+
+            {panorama && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 mb-8">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-6">Panorama Generated</h2>
+                <div className="scroll-container bg-black/50 rounded-xl p-2 mb-6">
+                  <img src={panorama} alt="Panorama" className="h-96 rounded-lg shadow-2xl" />
+                </div>
+                <a href={panorama} download="panorama.png" className="inline-flex items-center gap-2 bg-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700">
+                  <Download />
+                  Download Panorama
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<OpenCVPanorama />, document.getElementById("root"));
+  </script>
+</body>
+
 </html>

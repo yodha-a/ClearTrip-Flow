@@ -4,7 +4,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,46 +13,57 @@
 }
 
 .panorama-creator-modal {
-    background: #1a1a2e;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 800px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 20px;
+    width: 95%;
+    max-width: 900px;
     max-height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .panorama-creator-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
+    padding: 24px 28px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .panorama-creator-header h2 {
     margin: 0;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: 600;
 }
 
 .panorama-creator-header .close-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    font-size: 28px;
+    font-size: 24px;
     cursor: pointer;
     opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .panorama-creator-header .close-btn:hover {
     opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .panorama-creator-content {
-    padding: 24px;
+    padding: 28px;
     overflow-y: auto;
     flex: 1;
 }
@@ -61,13 +73,14 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 40px;
+    padding: 60px;
     color: #fbbf24;
+    font-size: 16px;
 }
 
 .spinner {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border: 3px solid rgba(255, 255, 255, 0.2);
     border-top-color: #22c55e;
     border-radius: 50%;
@@ -75,8 +88,8 @@
 }
 
 .spinner.small {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-width: 2px;
 }
 
@@ -88,78 +101,90 @@
 
 .upload-area {
     border: 2px dashed rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    padding: 40px;
+    border-radius: 16px;
+    padding: 60px 40px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 20px;
+    transition: all 0.3s;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .upload-area:hover {
     border-color: #22c55e;
-    background: rgba(34, 197, 94, 0.1);
+    background: rgba(34, 197, 94, 0.08);
+    transform: translateY(-2px);
 }
 
 .upload-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
+    font-size: 56px;
+    margin-bottom: 16px;
 }
 
 .upload-text {
     display: block;
     color: white;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .upload-hint {
     display: block;
     color: rgba(255, 255, 255, 0.5);
     font-size: 14px;
+    line-height: 1.5;
 }
 
 .images-list {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .images-list h3 {
-    margin: 0 0 16px 0;
+    margin: 0 0 20px 0;
     color: white;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .image-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     background: rgba(255, 255, 255, 0.05);
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s;
+}
+
+.image-item:hover {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .image-controls {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .move-btn {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
 .move-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .move-btn:disabled {
@@ -168,17 +193,19 @@
 }
 
 .image-number {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.5);
-    width: 24px;
+    color: rgba(255, 255, 255, 0.4);
+    width: 30px;
+    text-align: center;
 }
 
 .image-thumb {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .image-name {
@@ -191,14 +218,18 @@
 }
 
 .remove-btn {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.15);
     border: none;
     color: #ef4444;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .remove-btn:hover {
@@ -207,11 +238,11 @@
 
 .stitch-btn {
     width: 100%;
-    margin-top: 16px;
-    padding: 14px 24px;
+    margin-top: 20px;
+    padding: 16px 28px;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     color: white;
     font-size: 16px;
     font-weight: 600;
@@ -219,12 +250,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: all 0.2s;
+    gap: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 .stitch-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .stitch-btn:disabled {
@@ -237,36 +271,42 @@
 }
 
 .panorama-result h3 {
-    margin: 0 0 16px 0;
+    margin: 0 0 20px 0;
     color: #22c55e;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .panorama-preview {
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 12px;
-    padding: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    padding: 12px;
     overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .panorama-preview img {
-    max-height: 300px;
-    border-radius: 8px;
+    max-height: 350px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .status-log {
-    margin-top: 20px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    padding: 12px;
-    max-height: 150px;
+    margin-top: 24px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 16px;
+    max-height: 180px;
     overflow-y: auto;
-    font-family: monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
     font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .log-line {
-    color: rgba(255, 255, 255, 0.7);
-    padding: 2px 0;
+    color: rgba(255, 255, 255, 0.65);
+    padding: 3px 0;
+    line-height: 1.5;
 }
 
 /* Name Modal */
@@ -276,7 +316,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,46 +325,55 @@
 }
 
 .name-modal {
-    background: #1a1a2e;
-    border-radius: 16px;
-    padding: 24px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 20px;
+    padding: 28px;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .name-modal h3 {
-    margin: 0 0 16px 0;
+    margin: 0 0 20px 0;
     color: white;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .name-modal-preview {
-    margin-bottom: 16px;
-    border-radius: 8px;
+    margin-bottom: 20px;
+    border-radius: 12px;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px;
 }
 
 .name-modal-preview img {
     max-width: 100%;
-    max-height: 150px;
+    max-height: 180px;
     object-fit: contain;
+    border-radius: 8px;
 }
 
 .name-input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 14px 18px;
     font-size: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
     color: white;
     outline: none;
     box-sizing: border-box;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
 }
 
 .name-input:focus {
     border-color: #22c55e;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .name-input::placeholder {
@@ -332,37 +382,39 @@
 
 .name-modal-buttons {
     display: flex;
-    gap: 12px;
+    gap: 14px;
 }
 
 .name-modal-buttons button {
     flex: 1;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .download-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: white;
 }
 
 .download-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .save-btn {
-    background: #22c55e;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     border: none;
     color: white;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .save-btn:hover:not(:disabled) {
-    background: #16a34a;
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    transform: translateY(-1px);
 }
 
 .save-btn:disabled {
